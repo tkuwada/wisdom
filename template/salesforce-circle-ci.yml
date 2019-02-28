@@ -1,0 +1,28 @@
+version: 2
+
+# The specify "only","ignore" ..etc , it can filter or exclude CI build pipe line
+branches:
+
+# define the order of the workflow
+workflows:
+
+# You can specify the time to execute cron with the workflow defined in workflow_name.
+# and you can also specify branches to narrow or exclude branches to be executed
+triggers:
+
+# You can specify the order to execute with the workflow defined in workflow_name.
+# and For the specified job, it can have the attributes below.
+# type    : Specify approval so that job execution will not start unless you press the button manually on the WEB.
+# require : Until the specified job finished. The next job don't start.
+# filters : filter branches etc.. (e.g. develop , production branch only work)
+jobs:
+
+# You can specify the order of the job.
+# Reference other things, It can Define like "run, checkou,  restore_cache, deploy, store_artifacts, store_test_results, persist_to_workspace"
+steps:
+
+# Define the environment variable
+environment:
+
+# Specify the execution environment of the machine
+machine:
