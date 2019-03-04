@@ -19,31 +19,40 @@ jobs:
     build:
         # specify the docker image
         docker:
-            #- image: circleci/# [ToDo] node のimageを探す
+            - image: salestrip/sfdx-cli
         environment:
             TZ: /usr/share/zoneinfo/Asia/Tokyo # Time Zoneを指定
             SFDC_AUTH_TOKEN: null
         working_directory: ~/ci_app
         steps:
         - run:
-            name : Install Salesforce CLI # [ToDo] the module get from npm 
-            command : echo 'to do write command'
-        - run:
-            name : Get SFDC auth token # [ToDo] 
-            command : echo 'to do write command'
+              name: SFDX Version
+              command: |
+              sfdx --version
+              sfdx plugins --core
         - run:
             name : Code Style Linter # [ToDo] 
             command : echo 'to do write command'
+            sfdx force:lightning:lint ./force-app/main/default/aura/*
         - run:
             name: Setup Org # #[to do]ブランチ毎にダイナミックにビルド & テストデータを流し込む
             command : |
                 echo 'Running tests'
                 sfdx force:auth:jwt:grant --clientid $HUB_CONSUMER_KEY --jwtkeyfile assets/server.key --username $HUB_SFDC_USER --setdefaultdevhubusername -a hub
                 sfdx force:org:create -s -f ~/ci_app/config/project-scratch-def.json -a circle_build_$CIRCLE_BUILD_NUM --wait 10 #[to do]project json for testing
-                sfdx force:source:push -u circle_build_$CIRCLE_BUILD_NUM
+                sfdx force:source:push -u circle_build_$CIRCLE_BUILD_NUM 
+        - run :
+            name : Package Install
+            command: |
+                INSTALL_VER=$(jq -r '.result.MetadataPackageVersionId' /tmp/workspace/packageId.json)
+                sfdx force:package:install --package $INSTALL_VER \
+                               --noprompt \
+                               --publishwait $DEPLOY_TIMEOUT \
+                               --targetusername $TARGET_USERNAME \
+                               --wait $DEPLOY_TIMEOUT
         - run:
             name : Deploy Dependences resource from package.xml # [ToDo] 
-            command : echo 'to do write command'
+            command : echo 'to do Deploy Dependences resource from package.xml'
         - run:
             name : Create TestData # [ToDo] 
             command : echo 'to do write command'
@@ -56,27 +65,21 @@ jobs:
             path: ~/junit
         - run:
             name : Frontend Integration Tests # [ToDo] 
-            command : echo 'to do write command'
+            command : echo 'to do write command jest'
         - run:
             name : Delete Useless Scratch Org
             command : |
                 sfdx force:org:delete -u circle_build_$CIRCLE_BUILD_NUM -p
-        - run:
-            name : Notificate CI result # [ToDo] 
-            command : echo 'to do write command'
-        - run:
-            name : Notificate CI result # [ToDo] 
-            command : echo 'to do write command'
 
 # You can specify the order of the job.
 # Reference other things, It can Define like "run, checkou,  restore_cache, deploy, store_artifacts, store_test_results, persist_to_workspace"
-steps:
+# steps:
 
 # Define the environment variable
-environment:
+# environment:
 
 # Specify the execution environment of the machine
-machine:
+# machine:
 
 
 # steps description details.
