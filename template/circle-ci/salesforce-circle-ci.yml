@@ -1,0 +1,90 @@
+version: 2
+
+# The specify "only","ignore" ..etc , it can filter or exclude CI build pipe line
+branches:
+
+# define the order of the workflow
+workflows:
+
+# You can specify the time to execute cron with the workflow defined in workflow_name.
+# and you can also specify branches to narrow or exclude branches to be executed
+triggers:
+
+# You can specify the order to execute with the workflow defined in workflow_name.
+# and For the specified job, it can have the attributes below.
+# type    : Specify approval so that job execution will not start unless you press the button manually on the WEB.
+# require : Until the specified job finished. The next job don't start.
+# filters : filter branches etc.. (e.g. develop , production branch only work)
+jobs:
+    build:
+        # specify the docker image
+        docker:
+            - image: salestrip/sfdx-cli
+        environment:
+            TZ: /usr/share/zoneinfo/Asia/Tokyo # Time Zoneを指定
+            SFDC_AUTH_TOKEN: null
+        working_directory: ~/ci_app
+        steps:
+        - run:
+              name: SFDX Version
+              command: |
+              sfdx --version
+              sfdx plugins --core
+        - run:
+            name : Code Style Linter # [ToDo] 
+            command : echo 'to do write command'
+            sfdx force:lightning:lint ./force-app/main/default/aura/*
+        - run:
+            name: Setup Org # #[to do]ブランチ毎にダイナミックにビルド & テストデータを流し込む
+            command : |
+                echo 'Running tests'
+                sfdx force:auth:jwt:grant --clientid $HUB_CONSUMER_KEY --jwtkeyfile assets/server.key --username $HUB_SFDC_USER --setdefaultdevhubusername -a hub
+                sfdx force:org:create -s -f ~/ci_app/config/project-scratch-def.json -a circle_build_$CIRCLE_BUILD_NUM --wait 10 #[to do]project json for testing
+                sfdx force:source:push -u circle_build_$CIRCLE_BUILD_NUM 
+        - run :
+            name : Package Install
+            command: |
+                INSTALL_VER=$(jq -r '.result.MetadataPackageVersionId' /tmp/workspace/packageId.json)
+                sfdx force:package:install --package $INSTALL_VER \
+                               --noprompt \
+                               --publishwait $DEPLOY_TIMEOUT \
+                               --targetusername $TARGET_USERNAME \
+                               --wait $DEPLOY_TIMEOUT
+        - run:
+            name : Deploy Dependences resource from package.xml # [ToDo] 
+            command : echo 'to do Deploy Dependences resource from package.xml'
+        - run:
+            name : Create TestData # [ToDo] 
+            command : echo 'to do write command'
+        - run:
+            name : Run Apex Unit Tests
+            command : |
+                mkdir -p ~/junit
+                sfdx force:apex:test:run -c -d ~/junit -r junit --wait 10
+        - store_test_results:
+            path: ~/junit
+        - run:
+            name : Frontend Integration Tests # [ToDo] 
+            command : echo 'to do write command jest'
+        - run:
+            name : Delete Useless Scratch Org
+            command : |
+                sfdx force:org:delete -u circle_build_$CIRCLE_BUILD_NUM -p
+# You can specify the order of the job.
+# Reference other things, It can Define like "run, checkou,  restore_cache, deploy, store_artifacts, store_test_results, persist_to_workspace"
+# steps:
+
+# Define the environment variable
+# environment:
+
+# Specify the execution environment of the machine
+# machine:
+
+
+# steps description details.
+#
+# run        : it can extecute to set in "command". usage: test data creat, test execution.
+# save_cache : Save the directory or file specified by paths by specifying key.
+#            : THe key can specify .Branch, .BuildNum, .Revision, .CheckoutKey, .Environment.variableName, epoch, arch
+# store_artifacts: Download the deliverables to generate CI process file.
+# 
