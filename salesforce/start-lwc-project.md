@@ -1,59 +1,63 @@
 # Start Lightning Web Component Project
 
 
-##  Setup Salesforce Org
+###  Setup Salesforce Org
 
 -  Setup my domain
 
 -  Anable Devhub
+<br/>
+<br/>
 
-##  Local development enviropment
+###  Local development enviropment
 
 ####  Install Tools
 - [Salesforce CLI](https://developer.salesforce.com/ja/tools/sfdxcli)
 
-####  VSCode
+#####  VSCode
 
-####  Install VSCode Extention
+#####  Install VSCode Extention
 
 -  [Salesforce Extension Pack](https://marketplace.visualstudio.com/items?itemName=salesforce.salesforcedx-vscode)
 
 [dependencies]
  - the Java 8 Platform.
- 
-###  1.Create Project
+
+<br/>
+
+####  1.Create Project
 
 create project.
-####  VSCode
+#####  VSCode
   [Ctrl] + [Shift] + [P] > "SFDX:Create Project with Manifest "
 
-#### sfdx command
+##### sfdx command
 ```
 sfdx force:project:create --projectname {your projectname}
 ```
 
-### 2.Authorize DevHub
-####  VSCode
+#### 2.Authorize DevHub
+#####  VSCode
   [Ctrl] + [Shift] + [P] > "SFDX: Authorize a Dev Hub"
 
-#### sfdx command
+##### sfdx command
 ```
 sfdx force:auth:web:login --setdefaultdevhubusername
 ```
 
 
-### 3.Authorize DevHub
-####  VSCode
+#### 3.Authorize DevHub
+#####  VSCode
   [Ctrl] + [Shift] + [P] > "SFDX: Authorize a Dev Hub"
 
-#### sfdx command
+##### sfdx command
 ```
 sfdx force:auth:web:login --setdefaultdevhubusername
 ```
 
-### 4.Create Scratch Org
+#### 4.Create Scratch Org
 
-####  VSCode
+#####  VSCode
   [Ctrl] + [Shift] + [P] > "SFDX: Create a Default Scratch Org"
 
 #### sfdx command
@@ -61,19 +65,19 @@ sfdx force:auth:web:login --setdefaultdevhubusername
 sfdx force:org:create -f config\project-scratch-def.json --setalias {your some alias} --durationdays 30 --setdefaultusername
 ```
 
-### 5. Create Lightning Web Component
+#### 5. Create Lightning Web Component
 
-####  VSCode
+#####  VSCode
 Right click mouse on "force-app/main/default/lwc" > select "Create Lightning Web Component"
 
-#### sfdx command
+##### sfdx command
 ```
 sfdx force:lightning:component:create --type lwc --componentname {your lwc name} --outputdir force-app\main\default\lwc
 ```
 
-### 6. Deploy Lightning Web Component
+#### 6. Deploy Lightning Web Component
 
-####  VSCode
+#####  VSCode
 Push the source local to default scratch org.
 ```
 sfdx force:source:push -u {targetusername or alias}
